@@ -4,7 +4,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.apache.commons.compress.archivers.dump.InvalidFormatException;
 import org.apache.poi.*;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -113,7 +112,7 @@ public class MainDisplay {
 
 		shell = new Shell();
 		shell.setMinimumSize(new Point(173, 52));
-		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		shell.setSize(1200,660);
 		//shell.setSize(734, 576);
 		shell.setText("GSU TechCorner");
@@ -155,7 +154,7 @@ public class MainDisplay {
 		// Eagle ID
 		Label lblEagleID = new Label(shell, SWT.NONE);
 		lblEagleID.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
-		lblEagleID.setBounds(232, 63, 105, 26);
+		lblEagleID.setBounds(232, 63, 85, 26);
 		lblEagleID.setText("Eagle ID");
 		txtEagleID = new Text(shell, SWT.BORDER);
 		txtEagleID.setBounds(232, 90, 133, 26);
@@ -171,7 +170,7 @@ public class MainDisplay {
 		Label lblPhoneNum = new Label(shell, SWT.NONE);
 		lblPhoneNum.setText("Phone #");
 		lblPhoneNum.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
-		lblPhoneNum.setBounds(232, 148, 105, 21);
+		lblPhoneNum.setBounds(232, 148, 85, 21);
 		txtPhoneNum = new Text(shell, SWT.BORDER);
 		txtPhoneNum.setBounds(232, 175, 133, 25);
 		
@@ -179,7 +178,7 @@ public class MainDisplay {
 		lblProductUPC = new Label(shell, SWT.NONE);
 		lblProductUPC.setText("Product upc");
 		lblProductUPC.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
-		lblProductUPC.setBounds(20, 220, 172, 26);
+		lblProductUPC.setBounds(20, 220, 127, 26);
 		
 		txtUPC = new Text(shell, SWT.BORDER);
 		txtUPC.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
@@ -204,7 +203,7 @@ public class MainDisplay {
 		lblDescription = new Label(shell, SWT.NONE);
 		lblDescription.setText("Description");
 		lblDescription.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
-		lblDescription.setBounds(236, 220, 286, 26);
+		lblDescription.setBounds(236, 220, 113, 26);
 		
 		textDescription1 = new Text(shell, SWT.BORDER);
 		textDescription1.setFont(SWTResourceManager.getFont("Times New Roman", 14, SWT.NORMAL));
@@ -345,7 +344,7 @@ public class MainDisplay {
 				lblStatus.setText("Status: " + "Working.....");
 				
 				String CustomerName, EagleID, PhoneNum, Email;
-				CustomerName = txtCustomerName.getText(); EagleID = txtEmail.getText(); 
+				CustomerName = txtCustomerName.getText(); EagleID = txtEagleID.getText(); 
 				PhoneNum = txtPhoneNum.getText();         Email = txtEmail.getText();
 				
 				String upc1, upc2, upc3, upc4;
@@ -399,10 +398,10 @@ public class MainDisplay {
 					XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(xlfileDictName));
 					
 					Object[][] UnitInfo = {
-			                {CustomerName,PhoneNum,Email,EagleID,upc1, Description,Quantity1,SerialNum1, Price, Payment1},
-			                {"","","","",upc2, Description2, Quantity2, SerialNum2, Price2, Payment2},
-			                {"","","","",upc3, Description3, Quantity3, SerialNum3, Price3, Payment3},
-			                {"","","","",upc4, Description4, Quantity4, SerialNum4, Price4, Payment4},
+			                {CustomerName,PhoneNum,Email,EagleID,upc1, Description, SerialNum1, Quantity1, Price, Payment1},
+			                {"","","","",upc2, Description2, SerialNum2, Quantity2,  Price2, Payment2},
+			                {"","","","",upc3, Description3, SerialNum3, Quantity3,  Price3, Payment3},
+			                {"","","","",upc4, Description4, SerialNum4, Quantity4,  Price4, Payment4},
 			        };
 					
 					XSSFSheet sheet = workbook.getSheet(date);
@@ -411,7 +410,13 @@ public class MainDisplay {
 					if (Test != -1) {
 						sheet = workbook.getSheet(date);
 						} else {
-							workbook.createSheet(date);
+							sheet = workbook.createSheet(date);
+							Row row = sheet.createRow(0);
+							row.createCell(0).setCellValue("Customer Name"); row.createCell(1).setCellValue("Phone Number");
+							row.createCell(2).setCellValue("Email"); row.createCell(3).setCellValue("EagleID");
+							row.createCell(4).setCellValue("UPC"); row.createCell(5).setCellValue("Product Description");
+							row.createCell(6).setCellValue("Serial Number"); row.createCell(7).setCellValue("Quantity");
+							row.createCell(8).setCellValue("Price"); row.createCell(9).setCellValue("Payment Type");	
 						}
 					System.out.println("Sheet Checking Done");
 					int rowCount = sheet.getLastRowNum();
@@ -530,21 +535,27 @@ public class MainDisplay {
 					            String text = r.getText(0);
 					            
 					            if (text != null && text.contains("<name>")) {
-					                text = text.replace("<name>", CustomerName + " - Email:" + Email + " - Phone:" + PhoneNum);
+					                text = text.replace("<name>", CustomerName);// + " - Email:" + Email + " - Phone:" + PhoneNum);
 					                r.setText(text, 0);
 					            }
 										       				            
 					            if (text != null && text.contains("<date>")) {
 					                text = text.replace("<date>", date);
 					                r.setText(text, 0);
-					            }			            
+					            }
+					            
+					            if (text != null && text.contains("<contact>")) {
+					                text = text.replace("<contact>", "Email: " + Email + " - Phone: " + PhoneNum);
+					                r.setText(text, 0);
+					            }
+					            
 					            //Product 1
 					            if (text != null && text.contains("<product1>")) {
 					            	if(upc1 == "") {
 					            		text = text.replace("<product1>", "No Product");
 						                r.setText(text, 0);
 					            	}else {
-					                text = text.replace("<product1>", upc1 + " - " + Description + " @ $" + dQuantity1 * SubPrice1 + " " + Payment1);
+					                text = text.replace("<product1>", upc1 + " - " + Description + " - " + Quantity1 + " @ $" + dQuantity1 * SubPrice1 + " " + Payment1);
 					                r.setText(text, 0);
 					            	}
 					            }
@@ -558,7 +569,7 @@ public class MainDisplay {
 					            		text = text.replace("<product2>", "No Product");
 						                r.setText(text, 0);
 					            	}else {
-					                text = text.replace("<product2>", upc2 + " - " + Description2 + " @ $" + dQuantity2 * SubPrice2 + " " + Payment2);
+					                text = text.replace("<product2>", upc2 + " - " + Description2 + " - " + Quantity2 + " @ $" + dQuantity2 * SubPrice2 + " " + Payment2);
 					                r.setText(text, 0);
 					            	}
 					            }
@@ -572,7 +583,7 @@ public class MainDisplay {
 					            		text = text.replace("<product3>", "No Product");
 						                r.setText(text, 0);
 					            	}else {
-					                text = text.replace("<product3>", upc3 + " - " + Description3 + " @ $" + dQuantity3 * SubPrice3 + " " + Payment3);
+					                text = text.replace("<product3>", upc3 + " - " + Description3 + " - " + Quantity3 + " @ $" + dQuantity3 * SubPrice3 + " " + Payment3);
 					                r.setText(text, 0);
 					            	}
 					            }
@@ -586,7 +597,7 @@ public class MainDisplay {
 					            		text = text.replace("<product4>", "No Product");
 						                r.setText(text, 0);
 					            	}else {
-					                text = text.replace("<product4>", upc4 + " - " + Description4 + " @ $" + dQuantity4 * SubPrice4 + " - " + Payment4);
+					                text = text.replace("<product4>", upc4 + " - " + Description4 + " - " + Quantity4 + " @ $" + dQuantity4 * SubPrice4 + " " + Payment4);
 					                r.setText(text, 0);
 					            	}
 					            }
